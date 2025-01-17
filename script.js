@@ -4,10 +4,10 @@ const path=require('path')
 const fs=require('fs');
 
 const {S3Client, PutObjectCommand}=require('@aws-sk/client-s3')
-
+const mime= require('mime-types')
 
 const s3Client= new S3Client({
-	region:'',
+	region:'ap-south-1',
 	credentials:{
 		accessKeyId:'',
 		secretAccessKey:''
@@ -31,7 +31,11 @@ async function init(){
 		console.log('Build complete')
 
 		const distFolderPath=path.join(__dirname,'output','dist')
+		
+		
 		const distFolderContents=fs.readdirSync(distFolderPath,{})
+
+
 		for(const filePath of distFolderContents){
 			if(fs.lstatSync(filePath).isDirectory()) continue ;
 
@@ -43,9 +47,14 @@ async function init(){
 				contentType:mime.lookup(filePath)
 
 			})
+
+			await S3Client.send(command)
 		}
+		console.log("DONE ------")
 	})
 
 
 
 }
+
+init()
